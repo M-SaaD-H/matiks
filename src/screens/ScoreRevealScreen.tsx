@@ -137,8 +137,8 @@ export const ScoreRevealScreen: React.FC = () => {
             {/* Play Again Button */}
             <PlayAgainButton
               delay={scoreComplete ? 330 : 99999}
-              />
-            
+            />
+
             {/* Share Button */}
             <ShareButton
               delay={scoreComplete ? 400 : 99999}
