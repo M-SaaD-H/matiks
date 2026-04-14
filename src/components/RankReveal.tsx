@@ -66,7 +66,6 @@ export const RankReveal: React.FC<RankRevealProps> = ({
 
   return (
     <Animated.View style={[styles.container, containerStyle]}>
-      <View style={styles.rankCard}>
         <Animated.Text style={[styles.label, labelStyle]}>RANK</Animated.Text>
         <View style={styles.rankRow}>
           <View style={styles.rankInner}>
@@ -80,7 +79,6 @@ export const RankReveal: React.FC<RankRevealProps> = ({
             </View>
           </Animated.View>
         </View>
-      </View>
     </Animated.View>
   );
 };
@@ -89,16 +87,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     marginBottom: Spacing.xl,
-  },
-  rankCard: {
-    alignItems: 'center',
-    backgroundColor: Colors.surface,
-    paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.lg,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
-    minWidth: 200,
+    marginTop: Spacing.lg,
   },
   label: {
     fontSize: 12,

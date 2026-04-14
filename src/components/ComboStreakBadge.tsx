@@ -31,12 +31,12 @@ export const ComboStreakBadge: React.FC<ComboStreakBadgeProps> = ({
         withSpring(1.1, { damping: 12, stiffness: 140 }),
         withSpring(1, { damping: 12, stiffness: 140 })
       );
- 
+
       badgeOpacity.value = withSequence(
         withTiming(0.8, { duration: 0 }),
         withTiming(1, { duration: 400 })
       );
- 
+
 
       flameBlink.value = withRepeat(
         withSequence(
