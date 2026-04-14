@@ -24,8 +24,6 @@ export const RankReveal: React.FC<RankRevealProps> = ({
   const containerTranslateY = useSharedValue(50);
   const containerOpacity = useSharedValue(0);
   const labelOpacity = useSharedValue(0);
-  const rankScale = useSharedValue(0.5);
-  const rankOpacity = useSharedValue(0);
   const totalOpacity = useSharedValue(0);
 
   useEffect(() => {
@@ -41,17 +39,7 @@ export const RankReveal: React.FC<RankRevealProps> = ({
         mass: 0.8,
       });
 
-      // "RANK" label fades in first
       labelOpacity.value = withTiming(1, { duration: 400 });
-
-      // Rank number scales up with bounce (150ms delay)
-      rankOpacity.value = withDelay(150, withTiming(1, { duration: 300 }));
-      rankScale.value = withDelay(
-        150,
-        withSpring(1, { damping: 10, stiffness: 200 }),
-      );
-
-      // "of X,XXX" fades in after rank (350ms delay)
       totalOpacity.value = withDelay(
         350,
         withTiming(1, { duration: 500, easing: Easing.out(Easing.quad) }),
@@ -70,11 +58,6 @@ export const RankReveal: React.FC<RankRevealProps> = ({
     opacity: labelOpacity.value,
   }));
 
-  const rankStyle = useAnimatedStyle(() => ({
-    opacity: rankOpacity.value,
-    transform: [{ scale: rankScale.value }],
-  }));
-
   const totalStyle = useAnimatedStyle(() => ({
     opacity: totalOpacity.value,
   }));
@@ -86,10 +69,10 @@ export const RankReveal: React.FC<RankRevealProps> = ({
       <View style={styles.rankCard}>
         <Animated.Text style={[styles.label, labelStyle]}>RANK</Animated.Text>
         <View style={styles.rankRow}>
-          <Animated.View style={[styles.rankInner, rankStyle]}>
-            <Text style={styles.hash}>#</Text>
+          <View style={styles.rankInner}>
+            <Text style={styles.hash}># </Text>
             <Text style={styles.rankNumber}>{rank}</Text>
-          </Animated.View>
+          </View>
           <Animated.View style={totalStyle}>
             <View style={styles.ofRow}>
               <Text style={styles.of}> of </Text>

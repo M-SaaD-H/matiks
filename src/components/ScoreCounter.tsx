@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { StyleSheet, View, TextInput } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -8,8 +8,6 @@ import Animated, {
   withSequence,
   withSpring,
   Easing,
-  useAnimatedReaction,
-  runOnJS,
 } from 'react-native-reanimated';
 import { Colors, Fonts, Spacing } from '../theme';
 
@@ -31,14 +29,23 @@ export const ScoreCounter: React.FC<ScoreCounterProps> = ({
   const labelOpacity = useSharedValue(0);
   const scoreScale = useSharedValue(1);
   const dividerWidth = useSharedValue(0);
-  const hasCompleted = useSharedValue(false);
+  const hasCompleted = useRef(false);
+  const latestOnComplete = useRef(onComplete);
 
-  const handleComplete = useCallback(() => {
-    onComplete?.();
+  // Keep latest onComplete in a ref to avoid stale closure
+  useEffect(() => {
+    latestOnComplete.current = onComplete;
   }, [onComplete]);
 
+  const handleComplete = useCallback(() => {
+    if (!hasCompleted.current) {
+      hasCompleted.current = true;
+      latestOnComplete.current && latestOnComplete.current();
+    }
+  }, []);
+
   useEffect(() => {
-    hasCompleted.value = false;
+    hasCompleted.current = false;
     scoreScale.value = withSequence(
       withTiming(0.95, { duration: 0 }),
       withSpring(1.05, { damping: 12, stiffness: 140 }),
@@ -67,6 +74,10 @@ export const ScoreCounter: React.FC<ScoreCounterProps> = ({
         withTiming(finalScore, {
           duration: 400,
           easing: Easing.inOut(Easing.quad),
+        }, (isFinished) => {
+          if (isFinished) {
+            handleComplete();
+          }
         })
       );
     }, delay);

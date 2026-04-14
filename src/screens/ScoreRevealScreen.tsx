@@ -37,16 +37,9 @@ export const ScoreRevealScreen: React.FC = () => {
   const avatarOpacity = useSharedValue(0);
   const avatarRingRotate = useSharedValue(0);
   const footerOpacity = useSharedValue(0);
-  const scoreGlow = useSharedValue(0);
 
   const handleScoreComplete = useCallback(() => {
     setScoreComplete(true);
-    // Fire score glow pulse
-    scoreGlow.value = withSequence(
-      withTiming(1, { duration: 300 }),
-      withTiming(0.4, { duration: 800 }),
-      withTiming(0.6, { duration: 600 }),
-    );
   }, []);
 
   useEffect(() => {
@@ -79,11 +72,6 @@ export const ScoreRevealScreen: React.FC = () => {
   const avatarContainerStyle = useAnimatedStyle(() => ({
     opacity: avatarOpacity.value,
     transform: [{ scale: avatarScale.value }],
-  }));
-
-  const scoreGlowStyle = useAnimatedStyle(() => ({
-    opacity: scoreGlow.value * 0.6,
-    transform: [{ scale: 1 + scoreGlow.value * 0.15 }],
   }));
 
   const footerStyle = useAnimatedStyle(() => ({
@@ -126,9 +114,6 @@ export const ScoreRevealScreen: React.FC = () => {
               <Text style={styles.playerName}>{GAME_DATA.playerName}</Text>
             </Animated.View>
 
-            {/* Score Glow backdrop */}
-            <Animated.View style={[styles.scoreGlow, scoreGlowStyle]} />
-
             {/* Score Counter */}
             <ScoreCounter
               finalScore={GAME_DATA.score}
@@ -150,10 +135,14 @@ export const ScoreRevealScreen: React.FC = () => {
             />
 
             {/* Play Again Button */}
-            <PlayAgainButton />
+            <PlayAgainButton
+              delay={scoreComplete ? 330 : 99999}
+              />
             
             {/* Share Button */}
-            <ShareButton />
+            <ShareButton
+              delay={scoreComplete ? 400 : 99999}
+            />
           </View>
 
           {/* Matiks Branding */}
@@ -246,16 +235,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.textSecondary,
     fontWeight: '500',
-  },
-  scoreGlow: {
-    position: 'absolute',
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    backgroundColor: Colors.accentDim,
-    opacity: 0,
-    top: '32%',
-    zIndex: -1,
   },
   footer: {
     flexDirection: 'row',

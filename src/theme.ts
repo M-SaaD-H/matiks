@@ -24,7 +24,7 @@ export const Fonts = {
   scoreLabelSize: 15,
   comboSize: 20,
   rankSize: 18,
-  rankNumberSize: 28,
+  rankNumberSize: 24,
   buttonSize: 16,
   headerSize: 14,
 };

@@ -18,11 +18,16 @@ interface ShareButtonProps {
 export const ShareButton: React.FC<ShareButtonProps> = ({ delay = 0 }) => {
   const buttonScale = useSharedValue(1);
   const buttonOpacity = useSharedValue(0);
+  const buttonTranslateY = useSharedValue(20); // animate in from below
   const shimmerTranslateX = useSharedValue(-200);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       buttonOpacity.value = withTiming(1, { duration: 500 });
+      buttonTranslateY.value = withSpring(0, {
+        damping: 18,
+        stiffness: 140,
+      });
 
       // Shimmer loop
       shimmerTranslateX.value = withRepeat(
@@ -54,7 +59,10 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ delay = 0 }) => {
   };
 
   const buttonStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: buttonScale.value }],
+    transform: [
+      { scale: buttonScale.value },
+      { translateY: buttonTranslateY.value },
+    ],
     opacity: buttonOpacity.value,
   }));
 

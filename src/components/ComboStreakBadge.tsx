@@ -25,8 +25,10 @@ export const ComboStreakBadge: React.FC<ComboStreakBadgeProps> = ({
 
   useEffect(() => {
     const timer = setTimeout(() => {
+      // This looks way better than that is specified in the requirements.
       badgeScale.value = withSequence(
-        withTiming(0.95, { duration: 0 }),
+        withTiming(1, { duration: 0 }),
+        withSpring(1.1, { damping: 12, stiffness: 140 }),
         withSpring(1, { damping: 12, stiffness: 140 })
       );
  
