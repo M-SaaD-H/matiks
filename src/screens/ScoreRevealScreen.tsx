@@ -97,7 +97,6 @@ export const ScoreRevealScreen: React.FC = () => {
           {/* Header */}
           <Animated.View style={[styles.header, headerStyle]}>
             <Text style={styles.headerText}>MATCH COMPLETE</Text>
-            <View style={styles.headerDot} />
           </Animated.View>
 
           {/* Content */}
@@ -169,12 +168,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    ...Platform.select({
-      web: {
-        minHeight: 700,
-        minWidth: 380,
-      },
-    }),
   },
   innerWrapper: {
     flex: 1,
@@ -183,8 +176,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   header: {
-    paddingTop: 60,
-    paddingBottom: Spacing.md,
+    paddingTop: 40,
+    paddingBottom: Spacing.sm,
     alignItems: 'center',
   },
   headerText: {
@@ -193,28 +186,22 @@ const styles = StyleSheet.create({
     letterSpacing: 3,
     fontWeight: '600',
   },
-  headerDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: Colors.accent,
-    marginTop: Spacing.sm,
-  },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: Spacing.xl,
-    paddingBottom: Spacing.xxl,
+    paddingHorizontal: 0,
+    paddingBottom: Spacing.xxl / 2,
+    width: '100%',
   },
   avatarContainer: {
     alignItems: 'center',
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
   },
   avatarOuter: {
-    padding: 3,
+    padding: 4,
     borderRadius: 36,
-    borderWidth: 1.5,
+    borderWidth: 2,
     borderColor: Colors.accent,
     marginBottom: Spacing.sm,
   },
@@ -225,6 +212,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceLight,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 0,
+    margin: 0,
   },
   avatarText: {
     fontSize: 24,
@@ -235,22 +224,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.textSecondary,
     fontWeight: '500',
+    marginTop: 2,
+    marginBottom: 0,
+    padding: 0,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingBottom: 40,
+    paddingBottom: 36,
     alignItems: 'center',
+    marginTop: Spacing.xl,
   },
   footerText: {
     fontSize: 13,
     color: Colors.textMuted,
     fontWeight: '400',
+    marginRight: 2,
+    padding: 0,
   },
   footerBrand: {
     fontSize: 13,
     color: Colors.accent,
     fontWeight: '700',
     letterSpacing: 0.5,
+    padding: 0,
+    marginLeft: 2,
   },
 });

@@ -40,7 +40,7 @@ export const ComboStreakBadge: React.FC<ComboStreakBadgeProps> = ({
 
       flameBlink.value = withRepeat(
         withSequence(
-          withTiming(0.8, { duration: 800 }),
+          withTiming(0.7, { duration: 800 }),
           withTiming(1, { duration: 1000 })
         ),
         -1,

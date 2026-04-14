@@ -48,7 +48,7 @@ export const ScoreCounter: React.FC<ScoreCounterProps> = ({
     hasCompleted.current = false;
     scoreScale.value = withSequence(
       withTiming(0.95, { duration: 0 }),
-      withSpring(1.05, { damping: 12, stiffness: 140 }),
+      withSpring(1.1, { damping: 12, stiffness: 140 }),
       withSpring(1, { damping: 12, stiffness: 140 })
     );
   }, [finalScore]);
