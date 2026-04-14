@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { StyleSheet, View, Text, StatusBar } from 'react-native';
+import { StyleSheet, View, Text, StatusBar, ScrollView, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useSharedValue,
@@ -56,12 +56,9 @@ export const ScoreRevealScreen: React.FC = () => {
 
     // Avatar bounces in at 200ms
     avatarOpacity.value = withDelay(200, withTiming(1, { duration: 300 }));
-    avatarScale.value = withDelay(
-      200,
-      withSequence(
-        withSpring(1.1, { damping: 8, stiffness: 200 }),
-        withSpring(1.0, { damping: 14, stiffness: 180 }),
-      ),
+    avatarScale.value = withSequence(
+      withTiming(0.9, { duration: 0 }),
+      withSpring(1, { damping: 12, stiffness: 140 })
     );
 
     // Subtle ring rotation on avatar
@@ -93,17 +90,6 @@ export const ScoreRevealScreen: React.FC = () => {
     opacity: footerOpacity.value,
   }));
 
-  // Animation timeline:
-  // 0ms       → Header fades in, drops down
-  // 200ms     → Avatar bounces in
-  // 400ms     → Score starts counting
-  // 1000ms    → Combo badge enters (during count)
-  // ~2600ms   → Score finishes counting → confetti fires + glow
-  // ~2800ms   → Rank slides up (200ms after score)
-  // ~2800ms   → Footer branding fades in
-  // ~3200ms   → Share button fades in
-  // ~3600ms   → Play Again button fades in
-
   return (
     <View style={styles.root}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.background} />
@@ -114,61 +100,69 @@ export const ScoreRevealScreen: React.FC = () => {
         end={{ x: 0.5, y: 1 }}
       />
 
-      {/* Header */}
-      <Animated.View style={[styles.header, headerStyle]}>
-        <Text style={styles.headerText}>MATCH COMPLETE</Text>
-        <View style={styles.headerDot} />
-      </Animated.View>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.innerWrapper}>
+          {/* Header */}
+          <Animated.View style={[styles.header, headerStyle]}>
+            <Text style={styles.headerText}>MATCH COMPLETE</Text>
+            <View style={styles.headerDot} />
+          </Animated.View>
 
-      {/* Content */}
-      <View style={styles.content}>
-        {/* Player Avatar */}
-        <Animated.View style={[styles.avatarContainer, avatarContainerStyle]}>
-          <View style={styles.avatarOuter}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {GAME_DATA.playerName.charAt(0).toUpperCase()}
-              </Text>
-            </View>
+          {/* Content */}
+          <View style={styles.content}>
+            {/* Player Avatar */}
+            <Animated.View style={[styles.avatarContainer, avatarContainerStyle]}>
+              <View style={styles.avatarOuter}>
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>
+                    {GAME_DATA.playerName.charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.playerName}>{GAME_DATA.playerName}</Text>
+            </Animated.View>
+
+            {/* Score Glow backdrop */}
+            <Animated.View style={[styles.scoreGlow, scoreGlowStyle]} />
+
+            {/* Score Counter */}
+            <ScoreCounter
+              finalScore={GAME_DATA.score}
+              onComplete={handleScoreComplete}
+              delay={400}
+            />
+
+            {/* Combo Streak Badge */}
+            <ComboStreakBadge
+              streak={GAME_DATA.comboStreak}
+              delay={500}
+            />
+
+            {/* Rank Reveal - 200ms after score completes */}
+            <RankReveal
+              rank={GAME_DATA.rank}
+              totalPlayers={GAME_DATA.totalPlayers}
+              delay={scoreComplete ? 200 : 99999}
+            />
+
+            {/* Play Again Button */}
+            <PlayAgainButton />
+            
+            {/* Share Button */}
+            <ShareButton />
           </View>
-          <Text style={styles.playerName}>{GAME_DATA.playerName}</Text>
-        </Animated.View>
 
-        {/* Score Glow backdrop */}
-        <Animated.View style={[styles.scoreGlow, scoreGlowStyle]} />
-
-        {/* Score Counter */}
-        <ScoreCounter
-          finalScore={GAME_DATA.score}
-          onComplete={handleScoreComplete}
-          delay={400}
-        />
-
-        {/* Combo Streak Badge */}
-        <ComboStreakBadge
-          streak={GAME_DATA.comboStreak}
-          delay={1000}
-        />
-
-        {/* Rank Reveal - 200ms after score completes */}
-        <RankReveal
-          rank={GAME_DATA.rank}
-          totalPlayers={GAME_DATA.totalPlayers}
-          delay={scoreComplete ? 200 : 99999}
-        />
-
-        {/* Share Button */}
-        <ShareButton delay={scoreComplete ? 600 : 99999} />
-
-        {/* Play Again Button */}
-        <PlayAgainButton delay={scoreComplete ? 1000 : 99999} />
-      </View>
-
-      {/* Matiks Branding */}
-      <Animated.View style={[styles.footer, footerStyle]}>
-        <Text style={styles.footerText}>Plays on </Text>
-        <Text style={styles.footerBrand}>Matiks</Text>
-      </Animated.View>
+          {/* Matiks Branding */}
+          <Animated.View style={[styles.footer, footerStyle]}>
+            <Text style={styles.footerText}>Plays on </Text>
+            <Text style={styles.footerBrand}>Matiks</Text>
+          </Animated.View>
+        </View>
+      </ScrollView>
 
       {/* Confetti Burst */}
       <ConfettiBurst trigger={scoreComplete} />
@@ -180,6 +174,24 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    ...Platform.select({
+      web: {
+        minHeight: 700,
+        minWidth: 380,
+      },
+    }),
+  },
+  innerWrapper: {
+    flex: 1,
+    maxWidth: 480,
+    width: '100%',
+    alignSelf: 'center',
   },
   header: {
     paddingTop: 60,

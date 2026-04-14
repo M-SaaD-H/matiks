@@ -37,24 +37,14 @@ export const ScoreCounter: React.FC<ScoreCounterProps> = ({
     onComplete?.();
   }, [onComplete]);
 
-  // Track when score reaches final value
-  useAnimatedReaction(
-    () => Math.round(progress.value),
-    (current) => {
-      if (current >= finalScore && !hasCompleted.value) {
-        hasCompleted.value = true;
-        // Punch scale on completion
-        scoreScale.value = withSequence(
-          withSpring(1.08, { damping: 6, stiffness: 300 }),
-          withSpring(1.0, { damping: 12, stiffness: 200 }),
-        );
-        if (onComplete) {
-          runOnJS(handleComplete)();
-        }
-      }
-    },
-    [finalScore]
-  );
+  useEffect(() => {
+    hasCompleted.value = false;
+    scoreScale.value = withSequence(
+      withTiming(0.95, { duration: 0 }),
+      withSpring(1.05, { damping: 12, stiffness: 140 }),
+      withSpring(1, { damping: 12, stiffness: 140 })
+    );
+  }, [finalScore]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

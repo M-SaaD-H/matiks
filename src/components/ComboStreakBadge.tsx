@@ -3,11 +3,10 @@ import { StyleSheet, View, Text } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSequence,
-  withSpring,
-  withTiming,
   withRepeat,
-  withDelay,
+  withSequence,
+  withTiming,
+  withSpring,
 } from 'react-native-reanimated';
 import { Colors, Fonts, Spacing, Radius } from '../theme';
 
@@ -20,43 +19,30 @@ export const ComboStreakBadge: React.FC<ComboStreakBadgeProps> = ({
   streak,
   delay = 800,
 }) => {
-  const badgeScale = useSharedValue(0);
+  const badgeScale = useSharedValue(1);
   const badgeOpacity = useSharedValue(0);
-  const flameScale = useSharedValue(1);
-  const flameOpacity = useSharedValue(1);
+  const flameBlink = useSharedValue(1);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      // Badge entry: scale from 0 → 1.15 → 1.0 with bounce
-      badgeOpacity.value = withTiming(1, { duration: 200 });
       badgeScale.value = withSequence(
-        withSpring(1.15, { damping: 8, stiffness: 200 }),
-        withSpring(1.0, { damping: 12, stiffness: 180 })
+        withTiming(0.95, { duration: 0 }),
+        withSpring(1, { damping: 12, stiffness: 140 })
       );
-
-      // Flame pulsing: looping scale + opacity
-      flameScale.value = withDelay(
-        600,
-        withRepeat(
-          withSequence(
-            withTiming(1.2, { duration: 600 }),
-            withTiming(1.0, { duration: 600 })
-          ),
-          -1,
-          true
-        )
+ 
+      badgeOpacity.value = withSequence(
+        withTiming(0.8, { duration: 0 }),
+        withTiming(1, { duration: 400 })
       );
+ 
 
-      flameOpacity.value = withDelay(
-        600,
-        withRepeat(
-          withSequence(
-            withTiming(0.7, { duration: 600 }),
-            withTiming(1.0, { duration: 600 })
-          ),
-          -1,
-          true
-        )
+      flameBlink.value = withRepeat(
+        withSequence(
+          withTiming(0.8, { duration: 800 }),
+          withTiming(1, { duration: 1000 })
+        ),
+        -1,
+        true
       );
     }, delay);
 
@@ -68,15 +54,16 @@ export const ComboStreakBadge: React.FC<ComboStreakBadgeProps> = ({
     opacity: badgeOpacity.value,
   }));
 
-  const flameStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: flameScale.value }],
-    opacity: flameOpacity.value,
+  const flameBlinkStyle = useAnimatedStyle(() => ({
+    opacity: flameBlink.value,
   }));
 
   return (
     <Animated.View style={[styles.container, badgeStyle]}>
       <View style={styles.badge}>
-        <Animated.Text style={[styles.flame, flameStyle]}>🔥</Animated.Text>
+        <View style={styles.flameWrapper}>
+          <Animated.Text style={[styles.flame, flameBlinkStyle]}>🔥</Animated.Text>
+        </View>
         <View style={styles.textContainer}>
           <Text style={styles.streakNumber}>{streak}</Text>
           <Text style={styles.streakLabel}>Combo Streak!</Text>
@@ -89,29 +76,38 @@ export const ComboStreakBadge: React.FC<ComboStreakBadgeProps> = ({
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
   },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.comboBg,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
     borderRadius: Radius.full,
     borderWidth: 1,
     borderColor: 'rgba(255, 140, 66, 0.2)',
-    gap: Spacing.sm,
+    gap: Spacing.xs,
+  },
+  flameWrapper: {
+    width: 22,
+    height: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    overflow: 'visible',
   },
   flame: {
-    fontSize: 24,
+    fontSize: 21,
+    zIndex: 1,
   },
   textContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: Spacing.xs,
+    gap: Math.max(2, Math.floor(Spacing.xs / 2)),
   },
   streakNumber: {
-    fontSize: Fonts.comboSize,
+    fontSize: Fonts.comboSize - 2,
     fontWeight: '800',
     color: Colors.comboOrange,
   },
