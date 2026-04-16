@@ -8,7 +8,7 @@ import Animated, {
   withDelay,
   Easing,
 } from 'react-native-reanimated';
-import { Colors, Fonts, Spacing } from '../theme';
+import { Colors, Fonts, Spacing, Animations } from '../theme';
 
 interface RankRevealProps {
   rank: number;
@@ -16,11 +16,7 @@ interface RankRevealProps {
   delay?: number;
 }
 
-export const RankReveal: React.FC<RankRevealProps> = ({
-  rank,
-  totalPlayers,
-  delay = 0,
-}) => {
+export const RankReveal: React.FC<RankRevealProps> = ({ rank, totalPlayers, delay = 0 }) => {
   const containerTranslateY = useSharedValue(50);
   const containerOpacity = useSharedValue(0);
   const labelOpacity = useSharedValue(0);
@@ -30,24 +26,23 @@ export const RankReveal: React.FC<RankRevealProps> = ({
     const timer = setTimeout(() => {
       // Container slides up
       containerOpacity.value = withTiming(1, {
-        duration: 500,
+        duration: Animations.durations.md,
         easing: Easing.out(Easing.quad),
       });
-      containerTranslateY.value = withSpring(0, {
-        damping: 18,
-        stiffness: 120,
-        mass: 0.8,
-      });
+      containerTranslateY.value = withSpring(0, Animations.spring.default);
 
-      labelOpacity.value = withTiming(1, { duration: 400 });
+      labelOpacity.value = withTiming(1, { duration: Animations.durations.intermediate });
       totalOpacity.value = withDelay(
         350,
-        withTiming(1, { duration: 500, easing: Easing.out(Easing.quad) }),
+        withTiming(1, {
+          duration: Animations.durations.md,
+          easing: Easing.out(Easing.quad),
+        }),
       );
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [delay]);
+  }, [containerOpacity, containerTranslateY, labelOpacity, totalOpacity, delay]);
 
   const containerStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: containerTranslateY.value }],
@@ -66,19 +61,19 @@ export const RankReveal: React.FC<RankRevealProps> = ({
 
   return (
     <Animated.View style={[styles.container, containerStyle]}>
-        <Animated.Text style={[styles.label, labelStyle]}>RANK</Animated.Text>
-        <View style={styles.rankRow}>
-          <View style={styles.rankInner}>
-            <Text style={styles.hash}># </Text>
-            <Text style={styles.rankNumber}>{rank}</Text>
-          </View>
-          <Animated.View style={totalStyle}>
-            <View style={styles.ofRow}>
-              <Text style={styles.of}> of </Text>
-              <Text style={styles.total}>{formattedTotal}</Text>
-            </View>
-          </Animated.View>
+      <Animated.Text style={[styles.label, labelStyle]}>RANK</Animated.Text>
+      <View style={styles.rankRow}>
+        <View style={styles.rankInner}>
+          <Text style={styles.hash}># </Text>
+          <Text style={styles.rankNumber}>{rank}</Text>
         </View>
+        <Animated.View style={totalStyle}>
+          <View style={styles.ofRow}>
+            <Text style={styles.of}> of </Text>
+            <Text style={styles.total}>{formattedTotal}</Text>
+          </View>
+        </Animated.View>
+      </View>
     </Animated.View>
   );
 };

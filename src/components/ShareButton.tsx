@@ -9,7 +9,7 @@ import Animated, {
   withRepeat,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Colors, Fonts, Spacing, Radius } from '../theme';
+import { Colors, Fonts, Spacing, Radius, Animations } from '../theme';
 
 interface ShareButtonProps {
   delay?: number;
@@ -23,25 +23,22 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ delay = 0 }) => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      buttonOpacity.value = withTiming(1, { duration: 500 });
-      buttonTranslateY.value = withSpring(0, {
-        damping: 18,
-        stiffness: 140,
-      });
+      buttonOpacity.value = withTiming(1, { duration: Animations.durations.md });
+      buttonTranslateY.value = withSpring(0, Animations.spring.snappy);
 
       // Shimmer loop
       shimmerTranslateX.value = withRepeat(
         withSequence(
-          withTiming(200, { duration: 1500 }),
-          withTiming(-200, { duration: 0 })
+          withTiming(200, { duration: Animations.durations.shimmer }),
+          withTiming(-200, { duration: 0 }),
         ),
         -1,
-        false
+        false,
       );
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [delay]);
+  }, [buttonOpacity, buttonTranslateY, shimmerTranslateX, delay]);
 
   const handlePressIn = () => {
     buttonScale.value = withSpring(0.93, {
@@ -59,10 +56,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ delay = 0 }) => {
   };
 
   const buttonStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: buttonScale.value },
-      { translateY: buttonTranslateY.value },
-    ],
+    transform: [{ scale: buttonScale.value }, { translateY: buttonTranslateY.value }],
     opacity: buttonOpacity.value,
   }));
 
@@ -72,11 +66,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ delay = 0 }) => {
 
   return (
     <Animated.View style={[styles.wrapper, buttonStyle]}>
-      <Pressable
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={styles.button}
-      >
+      <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut} style={styles.button}>
         <View style={styles.buttonContent}>
           <Animated.Text style={styles.buttonText}>Share Result</Animated.Text>
           {/* Shimmer overlay */}

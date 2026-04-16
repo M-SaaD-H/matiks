@@ -7,32 +7,26 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Colors, Fonts, Spacing, Radius } from '../theme';
+import { Colors, Fonts, Spacing, Radius, Animations } from '../theme';
 
 interface PlayAgainButtonProps {
   delay?: number;
   onPress?: () => void;
 }
 
-export const PlayAgainButton: React.FC<PlayAgainButtonProps> = ({
-  delay = 0,
-  onPress,
-}) => {
+export const PlayAgainButton: React.FC<PlayAgainButtonProps> = ({ delay = 0, onPress }) => {
   const buttonScale = useSharedValue(1);
   const buttonOpacity = useSharedValue(0);
   const buttonTranslateY = useSharedValue(20);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      buttonOpacity.value = withTiming(1, { duration: 500 });
-      buttonTranslateY.value = withSpring(0, {
-        damping: 18,
-        stiffness: 140,
-      });
+      buttonOpacity.value = withTiming(1, { duration: Animations.durations.md });
+      buttonTranslateY.value = withSpring(0, Animations.spring.snappy);
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [delay]);
+  }, [buttonOpacity, buttonTranslateY, delay]);
 
   const handlePressIn = () => {
     buttonScale.value = withSpring(0.93, {
@@ -50,10 +44,7 @@ export const PlayAgainButton: React.FC<PlayAgainButtonProps> = ({
   };
 
   const buttonStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: buttonScale.value },
-      { translateY: buttonTranslateY.value },
-    ],
+    transform: [{ scale: buttonScale.value }, { translateY: buttonTranslateY.value }],
     opacity: buttonOpacity.value,
   }));
 
@@ -82,7 +73,6 @@ const styles = StyleSheet.create({
     borderRadius: Radius.lg,
     borderWidth: 1.5,
     borderColor: Colors.surfaceLight,
-    backgroundColor: 'transparent',
   },
   buttonText: {
     fontSize: Fonts.buttonSize,

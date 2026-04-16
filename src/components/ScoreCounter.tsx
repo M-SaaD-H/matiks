@@ -9,7 +9,7 @@ import Animated, {
   withSpring,
   Easing,
 } from 'react-native-reanimated';
-import { Colors, Fonts, Spacing } from '../theme';
+import { Colors, Fonts, Spacing, Animations } from '../theme';
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
@@ -48,42 +48,55 @@ export const ScoreCounter: React.FC<ScoreCounterProps> = ({
     hasCompleted.current = false;
     scoreScale.value = withSequence(
       withTiming(0.95, { duration: 0 }),
-      withSpring(1.1, { damping: 12, stiffness: 140 }),
-      withSpring(1, { damping: 12, stiffness: 140 })
+      withSpring(1.1, Animations.spring.bouncy),
+      withSpring(1, Animations.spring.bouncy),
     );
-  }, [finalScore]);
+  }, [scoreScale, finalScore]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       // Fade in label first
-      labelOpacity.value = withTiming(1, { duration: 400 });
-      scoreOpacity.value = withTiming(1, { duration: 300 });
+      labelOpacity.value = withTiming(1, { duration: Animations.durations.intermediate });
+      scoreOpacity.value = withTiming(1, { duration: Animations.durations.sm });
 
       // Divider grows in width
       dividerWidth.value = withTiming(40, {
-        duration: 600,
+        duration: Animations.durations.base,
         easing: Easing.out(Easing.quad),
       });
 
       // Animate score: tick up with slight overshoot
       progress.value = withSequence(
         withTiming(finalScore * 1.04, {
-          duration: 1800,
+          duration: Animations.durations.long,
           easing: Easing.out(Easing.cubic),
         }),
-        withTiming(finalScore, {
-          duration: 400,
-          easing: Easing.inOut(Easing.quad),
-        }, (isFinished) => {
-          if (isFinished) {
-            handleComplete();
-          }
-        })
+        withTiming(
+          finalScore,
+          {
+            duration: Animations.durations.intermediate,
+            easing: Easing.inOut(Easing.quad),
+          },
+          (isFinished) => {
+            if (isFinished) {
+              handleComplete();
+            }
+          },
+        ),
       );
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [finalScore, delay]);
+  }, [
+    dividerWidth,
+    handleComplete,
+    labelOpacity,
+    progress,
+    scoreOpacity,
+    scoreScale,
+    finalScore,
+    delay,
+  ]);
 
   // Use animatedProps to update TextInput value on UI thread
   const animatedProps = useAnimatedProps(() => {

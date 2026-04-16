@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { StyleSheet, View, Text, StatusBar, ScrollView, Platform } from 'react-native';
+import { StyleSheet, View, Text, StatusBar, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useSharedValue,
@@ -16,7 +16,7 @@ import { RankReveal } from '../components/RankReveal';
 import { ShareButton } from '../components/ShareButton';
 import { PlayAgainButton } from '../components/PlayAgainButton';
 import { ConfettiBurst } from '../components/ConfettiBurst';
-import { Colors, Spacing, Fonts } from '../theme';
+import { Colors, Spacing, Fonts, Animations } from '../theme';
 
 // Mock game data
 const GAME_DATA = {
@@ -44,14 +44,17 @@ export const ScoreRevealScreen: React.FC = () => {
 
   useEffect(() => {
     // Header fades in immediately
-    headerOpacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) });
-    headerTranslateY.value = withSpring(0, { damping: 20, stiffness: 150 });
+    headerOpacity.value = withTiming(1, {
+      duration: Animations.durations.base,
+      easing: Easing.out(Easing.quad),
+    });
+    headerTranslateY.value = withSpring(0, Animations.spring.gentle);
 
     // Avatar bounces in at 200ms
-    avatarOpacity.value = withDelay(200, withTiming(1, { duration: 300 }));
+    avatarOpacity.value = withDelay(200, withTiming(1, { duration: Animations.durations.sm }));
     avatarScale.value = withSequence(
       withTiming(0.9, { duration: 0 }),
-      withSpring(1, { damping: 12, stiffness: 140 })
+      withSpring(1, Animations.spring.bouncy),
     );
 
     // Subtle ring rotation on avatar
@@ -61,8 +64,15 @@ export const ScoreRevealScreen: React.FC = () => {
     );
 
     // Footer fades in late
-    footerOpacity.value = withDelay(2800, withTiming(1, { duration: 800 }));
-  }, []);
+    footerOpacity.value = withDelay(2800, withTiming(1, { duration: Animations.durations.lg }));
+  }, [
+    avatarOpacity,
+    avatarRingRotate,
+    avatarScale,
+    footerOpacity,
+    headerOpacity,
+    headerTranslateY,
+  ]);
 
   const headerStyle = useAnimatedStyle(() => ({
     opacity: headerOpacity.value,
@@ -121,10 +131,7 @@ export const ScoreRevealScreen: React.FC = () => {
             />
 
             {/* Combo Streak Badge */}
-            <ComboStreakBadge
-              streak={GAME_DATA.comboStreak}
-              delay={500}
-            />
+            <ComboStreakBadge streak={GAME_DATA.comboStreak} delay={500} />
 
             {/* Rank Reveal - 200ms after score completes */}
             <RankReveal
@@ -134,14 +141,10 @@ export const ScoreRevealScreen: React.FC = () => {
             />
 
             {/* Play Again Button */}
-            <PlayAgainButton
-              delay={scoreComplete ? 330 : 99999}
-            />
+            <PlayAgainButton delay={scoreComplete ? 330 : 99999} />
 
             {/* Share Button */}
-            <ShareButton
-              delay={scoreComplete ? 400 : 99999}
-            />
+            <ShareButton delay={scoreComplete ? 400 : 99999} />
           </View>
 
           {/* Matiks Branding */}

@@ -8,17 +8,14 @@ import Animated, {
   withTiming,
   withSpring,
 } from 'react-native-reanimated';
-import { Colors, Fonts, Spacing, Radius } from '../theme';
+import { Colors, Fonts, Spacing, Radius, Animations } from '../theme';
 
 interface ComboStreakBadgeProps {
   streak: number;
   delay?: number;
 }
 
-export const ComboStreakBadge: React.FC<ComboStreakBadgeProps> = ({
-  streak,
-  delay = 800,
-}) => {
+export const ComboStreakBadge: React.FC<ComboStreakBadgeProps> = ({ streak, delay = 800 }) => {
   const badgeScale = useSharedValue(1);
   const badgeOpacity = useSharedValue(0);
   const flameBlink = useSharedValue(1);
@@ -28,28 +25,27 @@ export const ComboStreakBadge: React.FC<ComboStreakBadgeProps> = ({
       // This looks way better than that is specified in the requirements.
       badgeScale.value = withSequence(
         withTiming(1, { duration: 0 }),
-        withSpring(1.1, { damping: 12, stiffness: 140 }),
-        withSpring(1, { damping: 12, stiffness: 140 })
+        withSpring(1.1, Animations.spring.bouncy),
+        withSpring(1, Animations.spring.bouncy),
       );
 
       badgeOpacity.value = withSequence(
         withTiming(0.8, { duration: 0 }),
-        withTiming(1, { duration: 400 })
+        withTiming(1, { duration: Animations.durations.intermediate }),
       );
-
 
       flameBlink.value = withRepeat(
         withSequence(
-          withTiming(0.7, { duration: 800 }),
-          withTiming(1, { duration: 1000 })
+          withTiming(0.7, { duration: Animations.durations.lg }),
+          withTiming(1, { duration: Animations.durations.oneSecond }),
         ),
         -1,
-        true
+        true,
       );
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [delay]);
+  }, [badgeOpacity, badgeScale, delay, flameBlink]);
 
   const badgeStyle = useAnimatedStyle(() => ({
     transform: [{ scale: badgeScale.value }],
@@ -88,7 +84,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     borderRadius: Radius.full,
     borderWidth: 1,
-    borderColor: 'rgba(255, 140, 66, 0.2)',
+    // borderColor: 'rgba(255, 140, 66, 0.2)',
     gap: Spacing.xs,
   },
   flameWrapper: {
@@ -111,12 +107,12 @@ const styles = StyleSheet.create({
   streakNumber: {
     fontSize: Fonts.comboSize - 2,
     fontWeight: '800',
-    color: Colors.comboOrange,
+    color: Colors.comboText,
   },
   streakLabel: {
     fontSize: Fonts.comboSize - 4,
     fontWeight: '600',
-    color: Colors.comboOrange,
+    color: Colors.comboText,
     opacity: 0.85,
   },
 });

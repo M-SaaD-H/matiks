@@ -7,7 +7,7 @@ import Animated, {
   interpolate,
   SharedValue,
 } from 'react-native-reanimated';
-import { Colors } from '../theme';
+import { Colors, Animations } from '../theme';
 
 interface Particle {
   id: number;
@@ -25,7 +25,6 @@ interface ConfettiBurstProps {
 }
 
 const PARTICLE_COUNT = 70;
-const DURATION = 3200;
 
 const GRAVITY = 0.22;
 const AIR_RESISTANCE = 0.985;
@@ -56,7 +55,7 @@ function generateParticles(width: number, height: number): Particle[] {
 
 function computeTrajectories(
   particles: Particle[],
-  totalFrames: number
+  totalFrames: number,
 ): { x: number; y: number }[][] {
   return particles.map((p) => {
     const frames: { x: number; y: number }[] = [];
@@ -116,22 +115,22 @@ export const ConfettiBurst: React.FC<ConfettiBurstProps> = ({ trigger }) => {
 
   const particles = useMemo(
     () => (trigger ? generateParticles(width, height) : []),
-    [trigger, width, height]
+    [trigger, width, height],
   );
 
   const trajectories = useMemo(
     () => (particles.length > 0 ? computeTrajectories(particles, TOTAL_FRAMES) : []),
-    [particles]
+    [particles],
   );
 
   useEffect(() => {
     if (trigger) {
       animationProgress.value = 0;
-      animationProgress.value = withTiming(1, { duration: DURATION });
+      animationProgress.value = withTiming(1, { duration: Animations.durations.confetti });
     } else {
       animationProgress.value = 0;
     }
-  }, [trigger]);
+  }, [animationProgress, trigger]);
 
   if (!trigger || particles.length === 0) return null;
 

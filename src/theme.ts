@@ -11,7 +11,7 @@ export const Colors = {
   white: '#FFFFFF',
   danger: '#FF6B6B',
   success: '#4ECDC4',
-  comboOrange: '#B0FA63',
+  comboText: '#B0FA63',
   comboBg: 'rgba(176, 250, 99, 0.12)',
   shimmer: 'rgba(255, 255, 255, 0.15)',
   shimmerBright: 'rgba(255, 255, 255, 0.7)',
@@ -45,4 +45,27 @@ export const Radius = {
   lg: 16,
   xl: 24,
   full: 999,
+};
+
+export const Animations = {
+  durations: {
+    xs: 150,
+    sm: 300,
+    md: 500,
+    intermediate: 400,
+    base: 600,
+    lg: 800,
+    oneSecond: 1000,
+    xl: 1200,
+    shimmer: 1500,
+    long: 1800,
+    slow: 2000,
+    confetti: 3200,
+  },
+  spring: {
+    default: { damping: 18, stiffness: 120, mass: 0.8 },
+    bouncy: { damping: 12, stiffness: 140 },
+    snappy: { damping: 18, stiffness: 140 },
+    gentle: { damping: 20, stiffness: 150 },
+  },
 };
